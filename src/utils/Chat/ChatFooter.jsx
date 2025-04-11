@@ -40,13 +40,12 @@ export const ChatFooter = ({ socket, theme, currentUser, room }) => {
         text: message,
         username: localStorage.getItem('userName'),
         userID: localStorage.getItem('userID'),
-        userIP: currentUser.ip,
+        userIP: currentUser.userIP,
         id: `${socket.id}${Math.random()}`,
         socketID: socket.id,
         roomLocation: room,
       });
     }
-    console.log({ userName: localStorage.getItem('userName'), message });
     setMessage('');
 
     animateScroll.scrollToBottom({

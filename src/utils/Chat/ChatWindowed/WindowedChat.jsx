@@ -9,23 +9,12 @@ export const WindowedChat = () => {
   const [messages, setMessages] = useState([]);
   const location = useLocation().pathname;
 
-  const room = `${document.title
-    .split(' ')[0]
-    .trim()
-    .trimEnd()
-    .toLowerCase()}_${location.replace('/lesson/', '').split('-chat')[0]}`;
-
-  console.log(room);
+  const room = 'eu_lesson';
 
   const socketRef = useRef(null);
 
   useEffect(() => {
-    document.title = `Merito ${location
-      .replace('/lesson/', '')[0]
-      .toUpperCase()}${location
-      .replace('/lesson/', '')
-      .slice(1)
-      .replace('-chat', '')} Chat Window`;
+    document.title = `Lesson Online | Education Union | Chat Window`;
 
     socketRef.current = io('https://ap-chat-server.onrender.com/');
 

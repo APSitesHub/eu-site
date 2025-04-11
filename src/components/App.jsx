@@ -5,19 +5,13 @@ import { WindowedChat } from 'utils/Chat/ChatWindowed/WindowedChat';
 import { Loader } from './SharedLayout/Loaders/Loader';
 
 const Streams = lazy(() =>
-  import(/* webpackChunkName: "Streams page" */ '../pages/Streams/Streams')
+  import(
+    /* webpackChunkName: "Streams layout page" */ '../pages/Streams/Streams'
+  )
 );
 
 const Stream = lazy(() =>
   import(/* webpackChunkName: "Stream page" */ '../pages/Streams/Stream/Stream')
-);
-
-const MyMerito = lazy(() =>
-  import(/* webpackChunkName: "My Merito Page" */ '../pages/MyMerito/MyMerito')
-);
-
-const NotFound = lazy(() =>
-  import(/* webpackChunkName: "Not Found" */ '../pages/NotFound/NotFound')
 );
 
 export const App = () => {
@@ -30,18 +24,13 @@ export const App = () => {
       />
       <Suspense fallback={Loader} noindex={true}>
         <Routes noindex={true}>
-          <Route path="/" element={<MyMerito />} noindex={true}>
-            <Route path="*" element={<NotFound />} noindex={true} />
-          </Route>
-          <Route path="lesson" element={<Streams />} noindex={true}>
-            <Route path="logistics" element={<Stream />} noindex={true} />
+          <Route path="/" element={<Streams />} noindex={true}>
+            <Route path="lesson" element={<Stream />} noindex={true} />
             <Route
-              path="logistics-chat"
+              path="lesson-chat"
               element={<WindowedChat />}
               noindex={true}
             />
-            <Route path="prep" element={<Stream />} noindex={true} />
-            <Route path="prep-chat" element={<WindowedChat />} noindex={true} />
           </Route>
         </Routes>
       </Suspense>

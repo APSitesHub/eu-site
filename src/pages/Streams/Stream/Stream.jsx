@@ -45,18 +45,10 @@ const Stream = () => {
 
   const socketRef = useRef(null);
 
-  const room = `${document.title
-    .split('|')[1]
-    ?.trim()
-    .trimEnd()
-    .toLowerCase()}_${location.replace('/lesson/', '')}`;
-
-  console.log(room);
+  const room = `eu_lesson`;
 
   useEffect(() => {
-    document.title = `Lesson Online | Merito | ${location
-      .replace('/lesson/', '')[0]
-      .toUpperCase()}${location.replace('/lesson/', '').slice(1)}`;
+    document.title = 'Lesson Online | Education Union';
 
     socketRef.current = io('https://ap-chat-server.onrender.com/');
 
@@ -150,7 +142,7 @@ const Stream = () => {
 
   return (
     <>
-      {(links[room] === undefined || links[room][0] < 10) && !isLoading ? (
+      {(links.eu === undefined || links.eu[0] < 10) && !isLoading ? (
         <StreamPlaceHolder>
           <StreamPlaceHolderText>
             No stream yet! <br />
@@ -186,7 +178,7 @@ const Stream = () => {
                 }}
                 width="100%"
                 height="100vh"
-                url={links[room]}
+                url={links.eu}
               />
             </VideoBox>
 

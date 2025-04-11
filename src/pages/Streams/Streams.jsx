@@ -3,9 +3,9 @@ import { StreamsBackgroundWrapper } from 'components/BackgroundWrapper/Backgroun
 import { FormBtnText, Label } from 'components/LeadForm/LeadForm.styled';
 import { Loader } from 'components/SharedLayout/Loaders/Loader';
 import { LoaderWrapper } from 'components/SharedLayout/Loaders/Loader.styled';
+import { LoginErrorNote } from 'components/Stream/MiscStyles.styled';
 import { Formik } from 'formik';
 import { nanoid } from 'nanoid';
-import { LoginErrorNote } from 'pages/MyMerito/MyMeritoPanel/MyMeritoPanel.styled';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
@@ -24,10 +24,6 @@ import {
 
 axios.defaults.baseURL = 'https://ap-server-8qi1.onrender.com';
 
-const setAuthToken = token => {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-};
-
 const Streams = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [links, setLinks] = useState({});
@@ -35,8 +31,6 @@ const Streams = () => {
   const [isUserLogged, setIsUserLogged] = useState(false);
   const [isUserInfoIncorrect, setIsUserInfoIncorrect] = useState(false);
   const location = useLocation();
-
-  console.log(location);
 
   const wakeupRequest = async () => {
     try {
@@ -47,55 +41,47 @@ const Streams = () => {
     }
   };
 
-  const detectUser = async () => {
-    try {
-      const id = localStorage.getItem('userID');
-      const user = await axios.get(
-        `https://ap-chat-server.onrender.com/users/${id}`
-      );
-      console.log(user.data, 'detect');
-      setCurrentUser(
-        currentUser =>
-          (currentUser = user.data || {
-            username: 'User Is Not Logged In',
-            isBanned: false,
-            userIP: 'no ip',
-          })
-      );
-    } catch (error) {
-      console.log(error);
+  const detectUser = () => {
+    const id = localStorage.getItem('userID');
+    const name = localStorage.getItem('userName');
+    if (!id || !name) {
+      setIsUserLogged(isLogged => (isLogged = false));
+      return;
     }
+    setCurrentUser(
+      currentUser =>
+        (currentUser = {
+          username: name,
+          userID: id,
+          userIP: '-',
+        })
+    );
+    setIsUserLogged(isLogged => (isLogged = true));
   };
 
   const initialLoginValues = {
-    mail: '',
-    password: '',
+    name: '',
   };
 
   const loginSchema = yup.object().shape({
-    mail: yup.string().required('Enter your email!'),
-    password: yup.string().required('Enter your password!'),
+    name: yup.string().required('Enter your name!'),
   });
 
-  const handleLoginSubmit = async (values, { resetForm }) => {
-    values.mail = values.mail.toLowerCase().trim().trimStart();
-    values.password = values.password.trim().trimStart();
-    try {
-      const response = await axios.post('/uniusers/login/lesson', values);
-      console.log(values);
-      console.log(response);
-      setAuthToken(response.data.token);
-      setIsUserLogged(isLogged => (isLogged = true));
-      setCurrentUser(currentUser => (currentUser = response.data.user));
-      localStorage.setItem('userID', nanoid(8));
-      localStorage.setItem('mail', values.mail);
-      localStorage.setItem('userName', response.data.user.name);
-      setIsUserInfoIncorrect(false);
-      resetForm();
-    } catch (error) {
-      error.response.status === 401 && setIsUserInfoIncorrect(true);
-      console.error(error);
-    }
+  const handleLoginSubmit = (values, { resetForm }) => {
+    values.name = values.name.trim().trimStart();
+
+    setIsUserLogged(isLogged => (isLogged = true));
+    localStorage.setItem('userID', nanoid(8));
+    localStorage.setItem('userName', values.name);
+    setCurrentUser(
+      currentUser =>
+        (currentUser = {
+          username: values.name,
+          userID: localStorage.getItem('userID'),
+        })
+    );
+    setIsUserInfoIncorrect(false);
+    resetForm();
   };
 
   useLayoutEffect(() => {
@@ -112,25 +98,6 @@ const Streams = () => {
       }
     };
     getLinksRequest();
-
-    const refreshToken = async () => {
-      console.log('token refresher');
-      try {
-        const res = await axios.post('/uniusers/refresh/lesson', {
-          mail: localStorage.getItem('mail'),
-        });
-        setIsUserLogged(isLogged => (isLogged = true));
-        const id = nanoid(8);
-        if (!localStorage.getItem('userID')) {
-          localStorage.setItem('userID', id);
-        }
-        localStorage.setItem('userName', res.data.user.name);
-        console.log(res);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    refreshToken();
   }, []);
 
   useEffect(() => {
@@ -147,29 +114,20 @@ const Streams = () => {
             validationSchema={loginSchema}
           >
             <LoginForm>
-              <LoginLogo src={logo} alt="Merito logo" />
+              <LoginLogo src={logo} alt="EU logo" />
               <LoginFormText>
                 <StreamAuthTextHello>Hello!</StreamAuthTextHello>
                 Our website is not available without authorization. Please enter
-                your email and password.
+                your name.
               </LoginFormText>
               <Label>
                 <AdminInput
                   type="text"
-                  name="mail"
-                  placeholder="Email"
+                  name="name"
+                  placeholder="Your name"
                   onBlur={() => setIsUserInfoIncorrect(false)}
                 />
-                <AdminInputNote component="p" name="mail" type="email" />
-              </Label>
-              <Label>
-                <AdminInput
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  onBlur={() => setIsUserInfoIncorrect(false)}
-                />
-                <AdminInputNote component="p" name="password" />
+                <AdminInputNote component="p" name="name" type="text" />
               </Label>
               <AdminFormBtn type="submit">
                 <FormBtnText>Log In</FormBtnText>
